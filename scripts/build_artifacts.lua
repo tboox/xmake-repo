@@ -12,7 +12,9 @@ function main()
            if instance and instance:script("install")
               and (instance.is_headeronly and not instance:is_headeronly()) then
                print(instance:name())
-               print(instance:versions())
+               local versions = instance:versions()
+               table.sort(versions, function (a, b) return a:lt(b) end)
+               print(versions)
            end
        end
     end
