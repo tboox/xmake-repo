@@ -1,3 +1,4 @@
+
 function main()
 
     -- get packages
@@ -11,17 +12,9 @@ function main()
        end
     end
 
-    -- remove unsupported packages
-    for idx, package in irpairs(packages) do
-        assert(package == package:lower(), "package(%s) must be lower case!", package)
-        if not _package_is_supported(argv, package) then
-            table.remove(packages, idx)
-        end
-    end
     if #packages == 0 then
         print("no testable packages on %s!", argv.plat or os.subhost())
         return
     end
-
     print(packages)
 end
