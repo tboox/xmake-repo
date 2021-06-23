@@ -1,4 +1,5 @@
 import("core.package.package")
+import("core.base.semver")
 
 function main()
     local files = os.iorun("git diff --name-only HEAD^")
@@ -13,7 +14,7 @@ function main()
               and (instance.is_headeronly and not instance:is_headeronly()) then
                print(instance:name())
                local versions = instance:versions()
-               table.sort(versions, function (a, b) return a:lt(b) end)
+               table.sort(versions, function (a, b) return semver.compare(a, b) < 0 end)
                print(versions)
            end
        end
