@@ -3,7 +3,7 @@ name: Deploy
 on:
   push:
     branches:
-      - master
+      - test
 
 jobs:
   build:
@@ -26,29 +26,6 @@ jobs:
           name: id_rsa # optional
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
-      - name: Installation
-        run: |
-          sudo apt update -y
-          sudo apt install -y wget
-          wget https://nodejs.org/dist/v14.15.4/node-v14.15.4-linux-x64.tar.xz
-          tar -xvf node-v14.15.4-linux-x64.tar.xz
-          export PATH=`pwd`/node-v14.15.4-linux-x64/bin:$PATH
-          sudo npm install markdown-to-html -g
-
       - name: Publish
-        run: |
-          git clone git@github.com:xmake-io/xrepo-docs.git
-          cd xrepo-docs
-          git remote add all git@github.com:xmake-io/xrepo-docs.git
-          git remote set-url --add all git@github.com:waruqi/xrepo-docs.git
-          git remote set-url --add all git@gitee.com:xmake-io/xrepo-docs.git
-          git remote set-url --add all git@gitlab.com:xmake-io/xrepo-docs.git
-          xmake l -vD `pwd`/build.lua
-          git config --global user.email "waruqi@gmail.com"
-          git config --global user.name "ruki"
-          git status
-          git add -A
-          git diff-index --quiet HEAD || git commit -m "autoupdate docs by xmake-repo/ci"
-          git push all master
-
-
+        run: 
+          xmake l scripts/build_artifacts.lua
