@@ -3,7 +3,7 @@ import("core.package.package")
 import("core.platform.platform")
 
 -- is supported platform and architecture?
-function _is_supported(instance, plat, arch, opt)
+function is_supported(instance, plat, arch, opt)
 
     -- get script
     local script = instance:get("install")
@@ -65,7 +65,7 @@ function main(opt)
                 if archs then
                     local package_archs = {}
                     for _, arch in ipairs(archs) do
-                        if _is_supported(instance, plat, arch, opt) then
+                        if is_supported(instance, plat, arch, opt) then
                             table.insert(package_archs, arch)
                         end
                     end
