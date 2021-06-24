@@ -4,6 +4,26 @@ import("core.base.semver")
 function build_artifacts(name, versions)
     local buildinfo = {name = name, versions = versions}
     print(buildinfo)
+    os.exec("git clone git@github.com:xmake-mirror/build-artifacts.git -b build")
+    local oldir = os.cd("build-artifacts")
+    local trycount = 0
+    while trycount < 2 do
+        local ok = try { function ()
+            os.exec("git reset --hard HEAD^")
+            os.exec("git pull origin build")
+            io.save("build.txt", buildinfo)
+            os.exec("git add -A")
+            os.exec("git commit -a -m \"autobuild %s by xmake-repo/ci\"", name)
+            os.exec("git push origin build")
+            return true
+        end }
+        if ok then
+            break
+        end
+        trycount = trycount + 1
+    end
+    assert(trycount < 2)
+    os.cd(oldir)
 end
 
 function main()
