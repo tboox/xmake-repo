@@ -1,5 +1,6 @@
 import("core.package.package")
 import("core.base.semver")
+import("packages")
 
 function build_artifacts(name, versions)
     local buildinfo = {name = name, versions = versions}
@@ -34,7 +35,7 @@ function main()
            local packagedir = path.directory(file)
            local packagename = path.filename(packagedir)
            local instance = package.load_from_repository(packagename, nil, packagedir, file)
-           if instance and instance:script("install")
+           if instance and packages.is_supported(instance, "windows")
               and (instance.is_headeronly and not instance:is_headeronly()) then
                local versions = instance:versions()
                if versions and #versions > 0 then
