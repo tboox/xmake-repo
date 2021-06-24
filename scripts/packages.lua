@@ -15,6 +15,7 @@ function is_supported(instance, plat, arch, opt)
         -- get plat and arch
         local plat = plat or ""
         local arch = arch or ""
+        print(instance:name(), plat, arch)
 
         -- match pattern
         --
@@ -39,6 +40,7 @@ function is_supported(instance, plat, arch, opt)
             if _pattern:trim() == "" and opt and opt.onlyhost then
                 _pattern = os.subhost()
             end
+            print(_pattern)
             if not _pattern:startswith("__") and (not hosts_spec or hosts[os.subhost() .. '|' .. os.subarch()] or hosts[os.subhost()])  
             and (_pattern:trim() == "" or (plat .. '|' .. arch):find('^' .. _pattern .. '$') or plat:find('^' .. _pattern .. '$')) then
                 result = _script
