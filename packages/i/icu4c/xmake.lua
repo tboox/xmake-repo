@@ -34,7 +34,7 @@ package("icu4c")
         local msbuild = find_tool("msbuild", {envs = envs})
         --os.execv(msbuild.program, configs, {envs = envs})
 
-        os.setenv("PATH", envs.PATH)
+        --os.setenv("PATH", envs.PATH)
     -- uses the given environments?
     local optenvs = envs
     envs = nil
@@ -42,6 +42,7 @@ package("icu4c")
         local envars = os.getenvs()
         for k, v in pairs(optenvs) do
             if k == "PATH" then
+                envars[k] = v
             else
                 envars[k] = v
                 print("set", k, v)
