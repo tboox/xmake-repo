@@ -34,6 +34,7 @@ package("icu4c")
         local msbuild = find_tool("msbuild", {envs = envs})
         --os.execv(msbuild.program, configs, {envs = envs})
 
+        os.setenv("PATH", envs.PATH)
     -- uses the given environments?
     local optenvs = envs
     envs = nil
