@@ -32,7 +32,7 @@ package("icu4c")
         --os.execv("C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Tools\\MSVC\\14.29.30037\\bin\\HostX64\\x64\\nmake.exe", {"/?"})
         --import("package.tools.msbuild").build(package, configs)--, {envs = envs})
         local msbuild = find_tool("msbuild", {envs = envs})
-        --os.execv(msbuild.program, configs, {envs = envs})
+        os.execv(msbuild.program, configs, {envs = envs})
 
         local function split_long_pathenv(envs, name)
     local value = envs[name]
@@ -60,6 +60,7 @@ end
 
         --os.setenv("PATH", envs.PATH)
     -- uses the given environments?
+        --[[
     local optenvs = envs
     envs = nil
     if optenvs then
@@ -93,7 +94,7 @@ end
         end
         proc:close()
     end
-    assert(ok == 0)
+    assert(ok == 0)]]
         os.cp("include", package:installdir())
         os.cp("bin*/*", package:installdir("bin"))
         os.cp("lib*/*", package:installdir("lib"))
