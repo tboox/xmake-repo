@@ -72,8 +72,8 @@ package("icu4c")
             -- we need fix too long value before running process
             if type(v) == "string" and #v > 4096 and os.host() == "windows" then
                 print("split", k)
-                --_split_long_pathenv(envars, k)
-                envars[k] = v:sub(1, 6500)
+                _split_long_pathenv(envars, k)
+                --envars[k] = v:sub(1, 6500)
             end
         end
         envs = {}
