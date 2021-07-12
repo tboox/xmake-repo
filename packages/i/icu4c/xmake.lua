@@ -42,7 +42,7 @@ package("icu4c")
         local envars = os.getenvs()
         for k, v in pairs(optenvs) do
             if k == "PATH" then
-                v = v:sub(1, 9000)
+                v = v:sub(1, 8000)
                 envars[k] = v
             else
                 envars[k] = v
