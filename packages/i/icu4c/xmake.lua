@@ -23,7 +23,45 @@ package("icu4c")
         local configs = {path.join("source", "allinone", "allinone.sln"), "/p:SkipUWP=True", "/p:_IsNativeEnvironment=true"}
         table.insert(configs, "/p:Configuration=" .. (package:debug() and "Debug" or "Release"))
         table.insert(configs, "/p:Platform=" .. (package:is_arch("x64") and "x64" or "Win32"))
-        import("package.tools.msbuild").build(package, configs)
+        local envs = import("package.tools.msbuild").buildenvs(package)
+        print("PATH", envs.PATH)
+        local files = os.files("C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30037/bin/HostX64/**/nmake.exe")
+        print(files)
+        import("lib.detect.find_tool")
+        --os.setenvs(envs)
+        --os.execv("C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Tools\\MSVC\\14.29.30037\\bin\\HostX64\\x64\\nmake.exe", {"/?"})
+        --import("package.tools.msbuild").build(package, configs)--, {envs = envs})
+        local msbuild = find_tool("msbuild", {envs = envs})
+        --os.execv(msbuild.program, configs, {envs = envs})
+
+    os.getenv("PATH_OLD", os.getenv("PATH"))
+    os.setenv("PATH", envs.PATH)
+    os.getenv("PATH_NEW", os.getenv("PATH"))
+    -- uses the given environments?
+    local optenvs = envs
+    envs = nil
+    if optenvs then
+        local envars = os.getenvs()
+        for k, v in pairs(optenvs) do
+            envars[k] = v
+        end
+        envs = {}
+        for k, v in pairs(envars) do
+            table.insert(envs, k .. '=' .. v)
+        end
+    end
+
+    import("core.base.process")
+    local ok = -1
+    local proc = process.openv(msbuild.program, configs or {})--, {envs = envs})
+    if proc ~= nil then
+        local waitok, status = proc:wait(-1)
+        if waitok > 0 then
+            ok = status
+        end
+        proc:close()
+    end
+    assert(ok == 0)
         os.cp("include", package:installdir())
         os.cp("bin*/*", package:installdir("bin"))
         os.cp("lib*/*", package:installdir("lib"))
