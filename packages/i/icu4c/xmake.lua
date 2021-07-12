@@ -34,9 +34,9 @@ package("icu4c")
         local msbuild = find_tool("msbuild", {envs = envs})
         --os.execv(msbuild.program, configs, {envs = envs})
 
-    os.getenv("PATH_OLD", os.getenv("PATH"))
+    print("PATH_OLD", os.getenv("PATH"))
     os.setenv("PATH", envs.PATH)
-    os.getenv("PATH_NEW", os.getenv("PATH"))
+    print("PATH_NEW", os.getenv("PATH"))
     -- uses the given environments?
     local optenvs = envs
     envs = nil
@@ -50,10 +50,12 @@ package("icu4c")
             table.insert(envs, k .. '=' .. v)
         end
     end
+       envs = os.getenvs()
+        --envs.PATH = PATH
 
     import("core.base.process")
     local ok = -1
-    local proc = process.openv(msbuild.program, configs or {})--, {envs = envs})
+    local proc = process.openv(msbuild.program, configs or {}, {envs = envs})
     if proc ~= nil then
         local waitok, status = proc:wait(-1)
         if waitok > 0 then
