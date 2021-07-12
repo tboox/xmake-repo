@@ -32,48 +32,47 @@ package("icu4c")
         --os.execv("C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Tools\\MSVC\\14.29.30037\\bin\\HostX64\\x64\\nmake.exe", {"/?"})
         --import("package.tools.msbuild").build(package, configs)--, {envs = envs})
         local msbuild = find_tool("msbuild", {envs = envs})
-        os.execv(msbuild.program, configs, {envs = envs})
+        --os.execv(msbuild.program, configs, {envs = envs})
 
-        local function split_long_pathenv(envs, name)
-    local value = envs[name]
-    if value and #value > 4096 then
-        local value_more = {}
-        local value_left = {}
-        local more_length = 0
-        for _, item in ipairs(path.splitenv(value, ';')) do
-            if #value - more_length > 4096 then
-                table.insert(value_more, item)
-                more_length = more_length + #item + 1
-            else
-                table.insert(value_left, item)
+        local function _split_long_pathenv(envs, name)
+            local value = envs[name]
+            if value and #value > 4096 then
+                local value_more = {}
+                local value_left = {}
+                local more_length = 0
+                for _, item in ipairs(path.splitenv(value)) do
+                    if #value - more_length > 4096 then
+                        table.insert(value_more, item)
+                        more_length = more_length + #item + 1
+                    else
+                        table.insert(value_left, item)
+                    end
+                end
+                if #value_left > 0 and #value_more > 0 then
+                    local morename = "__MORE_" .. name:upper() .. "__"
+                    table.insert(value_left, 1, "%" .. morename .. "%")
+                    envs[morename] = path.joinenv(value_more)
+                    envs[name] = path.joinenv(value_left)
+                end
             end
         end
-        if #value_left > 0 and #value_more > 0 then
-            local morename = "__MORE_" .. name:upper() .. "__"
-            table.insert(value_left, 1, "%" .. morename .. "%")
-            envs[morename] = path.joinenv(value_more)
-            envs[name] = path.joinenv(value_left)
-        end
-    end
-    return envs
-end
 
         --os.setenv("PATH", envs.PATH)
     -- uses the given environments?
-        --[[
+        
     local optenvs = envs
     envs = nil
     if optenvs then
         local envars = os.getenvs()
         for k, v in pairs(optenvs) do
-            if k == "PATH" then
-                if #v > 4096 then
-                    split_long_pathenv(envars, k)
-                else
-                    envars[k] = v
-                end
-            else
-                envars[k] = v
+            if type(v) == "table" then
+                v = path.joinenv(v)
+            end
+            envars[k] = v
+            -- we need fix too long value before running process
+            if type(v) == "string" and #v > 4096 and os.host() == "windows" then
+                print("split", k)
+                _split_long_pathenv(envars, k)
             end
         end
         envs = {}
@@ -94,7 +93,7 @@ end
         end
         proc:close()
     end
-    assert(ok == 0)]]
+    assert(ok == 0)
         os.cp("include", package:installdir())
         os.cp("bin*/*", package:installdir("bin"))
         os.cp("lib*/*", package:installdir("lib"))
