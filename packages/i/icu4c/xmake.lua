@@ -42,15 +42,15 @@ package("icu4c")
     envs = nil
     if optenvs then
         local envars = os.getenvs()
+            --[[
         for k, v in pairs(optenvs) do
             envars[k] = v
-        end
+        end]]
         envs = {}
         for k, v in pairs(envars) do
             table.insert(envs, k .. '=' .. v)
         end
     end
-       envs = os.getenvs()
         --envs.PATH = PATH
 
     import("core.base.process")
