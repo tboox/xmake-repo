@@ -49,7 +49,7 @@ package("icu4c")
                     end
                 end
                 if #value_left > 0 and #value_more > 0 then
-                    local morename = "__MORE_" .. name:upper() .. "__"
+                    local morename = "MORE_" .. name:upper() .. ""
                     table.insert(value_left, 1, "%" .. morename .. "%")
                     envs[morename] = path.joinenv(value_more)
                     envs[name] = path.joinenv(value_left)
