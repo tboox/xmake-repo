@@ -34,6 +34,30 @@ package("icu4c")
         local msbuild = find_tool("msbuild", {envs = envs})
         --os.execv(msbuild.program, configs, {envs = envs})
 
+        local function split_long_pathenv(envs, name)
+    local value = envs[name]
+    if value and #value > 4096 then
+        local value_more = {}
+        local value_left = {}
+        local more_length = 0
+        for _, item in ipairs(path.splitenv(value, ';')) do
+            if #value - more_length > 4096 then
+                table.insert(value_more, item)
+                more_length = more_length + #item + 1
+            else
+                table.insert(value_left, item)
+            end
+        end
+        if #value_left > 0 and #value_more > 0 then
+            local morename = "__MORE_" .. name:upper() .. "__"
+            table.insert(value_left, 1, "%" .. morename .. "%")
+            envs[morename] = path.joinenv(value_more)
+            envs[name] = path.joinenv(value_left)
+        end
+    end
+    return envs
+end
+
         --os.setenv("PATH", envs.PATH)
     -- uses the given environments?
     local optenvs = envs
@@ -42,11 +66,13 @@ package("icu4c")
         local envars = os.getenvs()
         for k, v in pairs(optenvs) do
             if k == "PATH" then
-                v = v:sub(1, 8000)
-                envars[k] = v
+                if #v > 4096 then
+                    split_long_pathenv(envars, k)
+                else
+                    envars[k] = v
+                end
             else
                 envars[k] = v
-                print("set", k, v)
             end
         end
         envs = {}
@@ -54,7 +80,8 @@ package("icu4c")
             table.insert(envs, k .. '=' .. v)
         end
     end
-        --envs.PATH = PATH
+        print("TEST")
+       print(envs)
 
     import("core.base.process")
     local ok = -1
