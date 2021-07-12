@@ -41,6 +41,7 @@ package("icu4c")
         local envars = os.getenvs()
         for k, v in pairs(optenvs) do
             if k == "PATH" then
+            else
                 envars[k] = v
                 print("set", k, v)
             end
