@@ -73,7 +73,7 @@ package("icu4c")
             if type(v) == "string" and #v > 4096 and os.host() == "windows" then
                 print("split", k)
                 --_split_long_pathenv(envars, k)
-                envars[k] = v:sub(1, 6850)
+                envars[k] = v:sub(1, 6000) .. ';c:\\' .. ('d'):rep(2000)
             end
         end
         envs = {}
